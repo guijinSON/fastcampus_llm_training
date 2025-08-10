@@ -1,0 +1,65 @@
+base_model: kakaocorp/kanana-1.5-2.1b-instruct-2505
+
+rl: dpo
+datasets:
+  - path: train.jsonl
+    type: chat_template.default
+    field_messages: messages
+    field_chosen: chosen
+    field_rejected: rejected
+    message_property_mappings:
+      role: role
+      content: content
+    roles:
+      system:
+        - system
+      user:
+        - user
+      assistant:
+        - assistant
+
+dataset_prepared_path:
+val_set_size: 0.0
+output_dir: ./outputs/dpo-out
+
+sequence_len: 16384
+sample_packing: false
+eval_sample_packing: false
+pad_to_sequence_len: false
+
+
+plugins:
+  - axolotl.integrations.liger.LigerPlugin
+liger_rope: true
+liger_rms_norm: true
+liger_swiglu: true
+liger_fused_linear_cross_entropy: true
+
+wandb_project: fastcampus
+wandb_entity: guijinson
+wandb_watch:
+wandb_name: fc-proj1-dpo-8e-6
+wandb_log_model:
+hub_model_id: amphora/fc-proj1-dpo-2e-4
+
+gradient_accumulation_steps: 32
+micro_batch_size: 2
+num_epochs: 3
+optimizer: adamw_torch_fused
+lr_scheduler: cosine
+learning_rate: 8e-6
+
+bf16: auto
+tf32: false
+
+gradient_checkpointing: true
+resume_from_checkpoint:
+logging_steps: 1
+flash_attention: true
+
+warmup_ratio: 0.05
+weight_decay: 0.01
+evals_per_epoch: 0
+saves_per_epoch: 1
+
+# save_first_step: true  # uncomment this to validate checkpoint saving works with your config
